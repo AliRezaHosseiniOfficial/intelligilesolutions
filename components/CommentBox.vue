@@ -1,11 +1,11 @@
 <template>
   <div class="box">
     <div class="box-body">
-      <img id="thumb" :src="data.thumb" alt="">
+      <img id="thumb" :src="product.acf.productimage" alt="">
       <div>
-        <h4>{{ data.title }}</h4>
+        <h4>{{ product.acf.productname }}</h4>
         <div class="d-flex gap-3 justify-content-between flex-wrap">
-          <ProductScore :score="data.score"/>
+          <!--          <ProductScore :score="product.score"/>-->
           <span>{{ data.time }}</span>
         </div>
         <p class="d-none d-md-block">{{ data.comment }}</p>
@@ -17,10 +17,34 @@
 
 <script>
 import ProductScore from "@/components/ProductScore";
+import axios from "axios";
+
 export default {
   name: "CommentBox",
   components: {ProductScore},
-  props: ['data']
+  props: ['data'],
+  data() {
+    return {
+      product: {
+        acf: {}
+      }
+    }
+  },
+  async created() {
+    const config = {
+      method: 'get',
+      url: `https://api.intelligilesolutions.com/wp-json/wp/v2/products/${this.data.productID}`,
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLmludGVsbGlnaWxlc29sdXRpb25zLmNvbSIsImlhdCI6MTY1OTI2NDA5MSwibmJmIjoxNjU5MjY0MDkxLCJleHAiOjE2NTk4Njg4OTEsImRhdGEiOnsidXNlciI6eyJpZCI6IjMwIn19fQ.t9rBxmg6RH6uYkSQY7xQsx9QcQdwmKzBfpzmpznev8I"
+      }
+    }
+    await axios(config).then(res => {
+      this.product = res.data
+    }).catch(err => {
+      console.log(err)
+    })
+  }
 }
 </script>
 

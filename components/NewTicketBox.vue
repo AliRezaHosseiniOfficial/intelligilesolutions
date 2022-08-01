@@ -9,13 +9,14 @@
         <option selected>Please select your department...</option>
         <option v-for="(item, i) in department" :key="i" :value="item">{{ item }}</option>
       </select>
-      <select class="form-select form-select-lg form-input">
-        <option selected>Please select priority...</option>
+      <select v-model="selectPriority" class="form-select form-select-lg form-input">
+        <option value="noselect" selected>Please select priority...</option>
         <option v-for="(item, i) in priority" :key="i" :value="item">{{ item }}</option>
       </select>
-      <input v-model="subject" class="form-control form-input mt-2 mb-4" type="text" placeholder="Write your subject...">
+      <input v-model="subject" class="form-control form-input mt-2 mb-4" type="text"
+             placeholder="Write your subject...">
       <v-editor v-model="message"/>
-      <div class="button-add">Send Ticket</div>
+      <div @click="sendTicket" class="button-add">Send Ticket</div>
     </div>
   </Modal>
 </template>
@@ -23,6 +24,7 @@
 <script>
 import Modal from "@/components/Modal";
 import InputField from "@/components/InputField";
+import axios from "axios";
 
 export default {
   name: "NewTicketBox",
@@ -34,7 +36,36 @@ export default {
       priority: ['low', 'medium', 'height'],
       department: ['Sale', 'Finance', 'Support'],
       subject: '',
-      message: ''
+      message: '',
+      selectPriority: 'noselect',
+    }
+  },
+  methods: {
+    async sendTicket() {
+      const config = {
+        method: 'post',
+        url: "https://api.intelligilesolutions.com/wp-json/wp/v2/ticket",
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLmludGVsbGlnaWxlc29sdXRpb25zLmNvbSIsImlhdCI6MTY1OTI2NDA5MSwibmJmIjoxNjU5MjY0MDkxLCJleHAiOjE2NTk4Njg4OTEsImRhdGEiOnsidXNlciI6eyJpZCI6IjMwIn19fQ.t9rBxmg6RH6uYkSQY7xQsx9QcQdwmKzBfpzmpznev8I"
+        },
+        data: {
+          acf: {
+            "ticket_content": this.message,
+            "ticket_Priority": this.selectPriority,
+            "ticket_subject": "",
+            "ticket_author": "TEST",
+            "ticket_status": "pending",
+            "date": new Date().toDateString(),
+            "time": new Date().toTimeString()
+          }
+        }
+      }
+      await axios(config).then(res => {
+        this.$emit('close', false)
+      }).catch(err => {
+        console.log(err)
+      })
     }
   }
 }
@@ -67,6 +98,19 @@ export default {
   margin-bottom: 12px;
   height: 48px;
   font-size: 16px;
+}
+
+.form-select {
+  display: block;
+  width: 100%;
+  font-weight: 400;
+  line-height: 1.5;
+  padding-left: 15px;
+  background-image: url('~/assets/svg/selection.svg') !important;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  appearance: none;
 }
 
 .ck.ck-editor {

@@ -16,7 +16,14 @@
       </div>
     </Portal>
     <h3 class="pb-2">Comments</h3>
-    <comment-box v-for="item in data" :key="item.id" :data="item"/>
+    <comment-box v-if="comments.length" v-for="item in comments" :key="item.id"
+                 :data="{
+                   title: '',
+                   comment: item.acf.commenttxt,
+                   thumb: '/images/img1.jpg',
+                   time: item.acf.time,
+                   productID: item.acf.productid
+                 }"/>
     <pagination :pages="5" :select="1"/>
   </div>
 
@@ -25,6 +32,7 @@
 <script>
 import CommentBox from "@/components/CommentBox";
 import Pagination from "@/components/Pagination";
+import axios from "axios";
 
 export default {
   name: "index",
@@ -33,15 +41,81 @@ export default {
   data() {
     return {
       data: [
-        {id: 1, thumb: "/images/img1.jpg", title: "Sella body butter", score: 3, time: 'September30,2022 at 10:56 am', comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'},
-        {id: 2, thumb: "/images/img1.jpg", title: "Sella body butter", score: 3, time: 'September30,2022 at 10:56 am', comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'},
-        {id: 3, thumb: "/images/img1.jpg", title: "Sella body butter", score: 3, time: 'September30,2022 at 10:56 am', comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'},
-        {id: 4, thumb: "/images/img1.jpg", title: "Sella body butter", score: 3, time: 'September30,2022 at 10:56 am', comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'},
-        {id: 5, thumb: "/images/img1.jpg", title: "Sella body butter", score: 3, time: 'September30,2022 at 10:56 am', comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'},
-        {id: 6, thumb: "/images/img1.jpg", title: "Sella body butter", score: 3, time: 'September30,2022 at 10:56 am', comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'},
-        {id: 7, thumb: "/images/img1.jpg", title: "Sella body butter", score: 3, time: 'September30,2022 at 10:56 am', comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'},
+        {
+          id: 1,
+          thumb: "/images/img1.jpg",
+          title: "Sella body butter",
+          score: 3,
+          time: 'September30,2022 at 10:56 am',
+          comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'
+        },
+        {
+          id: 2,
+          thumb: "/images/img1.jpg",
+          title: "Sella body butter",
+          score: 3,
+          time: 'September30,2022 at 10:56 am',
+          comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'
+        },
+        {
+          id: 3,
+          thumb: "/images/img1.jpg",
+          title: "Sella body butter",
+          score: 3,
+          time: 'September30,2022 at 10:56 am',
+          comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'
+        },
+        {
+          id: 4,
+          thumb: "/images/img1.jpg",
+          title: "Sella body butter",
+          score: 3,
+          time: 'September30,2022 at 10:56 am',
+          comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'
+        },
+        {
+          id: 5,
+          thumb: "/images/img1.jpg",
+          title: "Sella body butter",
+          score: 3,
+          time: 'September30,2022 at 10:56 am',
+          comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'
+        },
+        {
+          id: 6,
+          thumb: "/images/img1.jpg",
+          title: "Sella body butter",
+          score: 3,
+          time: 'September30,2022 at 10:56 am',
+          comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'
+        },
+        {
+          id: 7,
+          thumb: "/images/img1.jpg",
+          title: "Sella body butter",
+          score: 3,
+          time: 'September30,2022 at 10:56 am',
+          comment: 'I really had to prep my face to make it super hydrated. I found the coverage better with a brush but'
+        },
       ]
     }
+  },
+  async asyncData() {
+    const config = {
+      method: 'get',
+      url: "https://api.intelligilesolutions.com/wp-json/wp/v2/comments",
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLmludGVsbGlnaWxlc29sdXRpb25zLmNvbSIsImlhdCI6MTY1OTI2NDA5MSwibmJmIjoxNjU5MjY0MDkxLCJleHAiOjE2NTk4Njg4OTEsImRhdGEiOnsidXNlciI6eyJpZCI6IjMwIn19fQ.t9rBxmg6RH6uYkSQY7xQsx9QcQdwmKzBfpzmpznev8I"
+      }
+    }
+    return await axios(config).then(res => {
+      return {
+        comments: res.data
+      }
+    }).catch(err => {
+      console.log(err)
+    })
   }
 }
 </script>

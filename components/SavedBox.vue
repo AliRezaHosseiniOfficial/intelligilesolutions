@@ -11,7 +11,7 @@
       </div>
       <div class="box-buttons">
         <button class="button-add">Add To Cart</button>
-        <button class="button-remove">
+        <button @click="deleteFromSaved" class="button-remove">
           <img src="~/assets/svg/trash.svg" width="12" alt="">
           Delete
         </button>
@@ -27,6 +27,11 @@ export default {
   name: "SavedBox",
   components: {ProductScore},
   props: ['thumb', 'title', 'price', 'score'],
+  methods: {
+    deleteFromSaved() {
+      this.$emit('deleting')
+    }
+  }
 }
 </script>
 

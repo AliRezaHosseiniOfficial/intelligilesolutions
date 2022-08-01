@@ -5,7 +5,7 @@
   "author": "Pedram Alidoust",
   "private": true,
   "scripts": {
-    "dev": "nuxt --hostname 'localhost' --port '3003'",
+    "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start --hostname 'localhost' --port '3003'",
     "generate": "nuxt generate"
@@ -36,9 +36,12 @@
     "vue-axios": "^3.4.1",
     "vue-split-carousel": "^1.1.1",
     "vue-ssr-carousel": "^1.4.0",
-    "woocommerce-api": "^1.5.0"
+    "woocommerce-api": "^1.5.0",
+    "@nuxtjs/svg": "^0.4.0",
+    "nuxt-svg-loader": "^1.2.0"
   },
   "devDependencies": {
+    "@nuxt/types": "~2.15.0",
     "cross-env": "^5.0.1"
   }
 }

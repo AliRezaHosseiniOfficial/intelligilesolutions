@@ -4,8 +4,8 @@
     <transition>
       <div class="dialog-wrapper" v-if="open">
         <div class="dialog-body">
-          <div class="dialog-header">
-            <h4>{{ title }}</h4>
+          <div class="dialog-header" :class="{'has-title':title}">
+            <h4 v-if="title">{{ title }}</h4>
             <span @click="close">
               &#215;
             </span>
@@ -97,10 +97,9 @@ export default {
 
 .dialog-body {
   background-color: white;
-  overflow: hidden;
   border-radius: 16px;
   margin: 0 36px;
-  max-width: 640px;
+  max-width: 680px;
   width: 100%;
   height: fit-content;
   z-index: 9999;
@@ -112,14 +111,20 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
-  background: #65a79f;
-  color: white;
   justify-content: center;
   padding: 14px 0 10px;
+  overflow: hidden;
+  height: 60px;
+  border-radius: 16px 16px 0 0;
 }
 
 .dialog-header h4 {
   font-size: 20px;
+}
+
+.has-title {
+  background: #65a79f;
+  color: white;
 }
 
 .dialog-header span {

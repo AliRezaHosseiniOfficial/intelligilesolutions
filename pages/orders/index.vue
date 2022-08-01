@@ -25,19 +25,35 @@
     <div class="container g-0 mb-10">
       <!--  Delivered Items -->
       <div class="row row-cols-1 gap-3" v-if="state==='delivered'">
-        <OrderBox state="delivered" :price="500" date="September 30, 2022" time="10:51 am" :orders="data"/>
-        <OrderBox state="delivered" :price="900" date="December 30, 2021" time="11:51 pm" :orders="data"/>
+        <OrderBox v-if="ordersDelivered.length"
+                  v-for="item in ordersDelivered" :key="item.id" :price="item.acf.product_price"
+                  :date="item.acf.date" :time="item.acf.time"
+                  state="delivered"
+                  :orders="[{
+                        date: item.acf.date,
+                         price: item.acf.product_price,
+                          time: item.acf.time,
+                           title: item.acf.product_title,
+                            thumb: item.acf.productimage
+                      }]"/>
       </div>
       <div class="row row-cols-1 gap-3" v-if="state==='pending'">
         <!--  Pending orders  -->
-        <OrderBox :price="300" :orders="data"/>
+        <OrderBox v-if="ordersPending.length"
+                  v-for="item in ordersPending" :key="item.id" :price="+item.acf.product_price"
+                  :date="new Date(item.acf.date).toDateString()" :time="item.acf.time"
+                  :orders="[{
+                        price: item.acf.product_price,
+                       title: item.acf.product_title,
+                        thumb: item.acf.productimage
+                      }]"/>
       </div>
     </div>
   </div>
 </template>
-
 <script>
 import OrderBox from "@/components/OrderBox";
+import axios from "axios";
 
 export default {
   name: "index",
@@ -50,8 +66,32 @@ export default {
         {id: 1, thumb: "/images/img1.jpg", title: "Sella body butter", price: 250},
         {id: 2, thumb: "/images/img1.jpg", title: "Sella body butter", price: 450},
         {id: 3, thumb: "/images/img1.jpg", title: "Sella body butter", price: 350},
-      ]
+      ],
+      ordersDelivered: [],
+      ordersPending: []
     }
+  },
+  async asyncData() {
+    const config = {
+      method: 'get',
+      url: "https://api.intelligilesolutions.com/wp-json/wp/v2/orders",
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLmludGVsbGlnaWxlc29sdXRpb25zLmNvbSIsImlhdCI6MTY1OTI2NDA5MSwibmJmIjoxNjU5MjY0MDkxLCJleHAiOjE2NTk4Njg4OTEsImRhdGEiOnsidXNlciI6eyJpZCI6IjMwIn19fQ.t9rBxmg6RH6uYkSQY7xQsx9QcQdwmKzBfpzmpznev8I"
+      }
+    }
+    return await axios(config).then(res => {
+      return {
+        ordersDelivered: res.data.filter(item => {
+          return item.acf.orderstatus === 'delivered'
+        }),
+        ordersPending: res.data.filter(item => {
+          return item.acf.orderstatus === 'pending'
+        })
+      }
+    }).catch(err => {
+      console.log(err)
+    })
   }
 }
 </script>

@@ -20,7 +20,14 @@
       <Pagination :pages="6" :select="1"/>
       <div class="button-add" @click="show=true">Add new Ticket</div>
     </div>
-    <TicketBox v-for="item in data" :key="item.id" :data="item"/>
+    <TicketBox v-for="item in tickets" :key="item.id" :data="{
+      id: item.id,
+      user: {avatar: '', name: item.acf.ticket_author},
+      time: new Date(item.acf.date).toDateString() + ' ' + item.acf.time,
+      message: item.acf.ticket_content,
+      state: item.acf.ticket_status,
+      priority: item.acf.ticket_Priority
+      }"/>
     <NewTicketBox :open="show" @close="show=false"/>
   </div>
 </template>
@@ -29,6 +36,7 @@
 import Pagination from "@/components/Pagination";
 import TicketBox from "@/components/TicketBox";
 import NewTicketBox from "@/components/NewTicketBox";
+import axios from "axios";
 
 export default {
   name: "index",
@@ -39,7 +47,7 @@ export default {
       show: false,
       data: [
         {
-          id: "58/cart",
+          id: "58",
           state: 'open',
           priority: 'medium',
           time: 'September 30,2022 at 10:56 am',
@@ -51,7 +59,7 @@ export default {
           }
         },
         {
-          id: "59/cart",
+          id: "59",
           state: 'pending',
           priority: 'medium',
           time: 'May 26,2022 at 18:50 pm',
@@ -63,7 +71,7 @@ export default {
           }
         },
         {
-          id: "60/cart",
+          id: "60",
           state: 'closed',
           priority: 'low',
           time: 'June 21,2022 at 08:44 pm',
@@ -75,7 +83,7 @@ export default {
           }
         },
         {
-          id: "61/cart",
+          id: "61",
           state: 'open',
           priority: 'high',
           time: 'June 18,2022 at 08:00 pm',
@@ -88,6 +96,25 @@ export default {
         },
       ]
     }
+  },
+  mounted() {
+  },
+  async asyncData() {
+    const config = {
+      method: 'get',
+      url: "https://api.intelligilesolutions.com/wp-json/wp/v2/ticket",
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLmludGVsbGlnaWxlc29sdXRpb25zLmNvbSIsImlhdCI6MTY1OTI2NDA5MSwibmJmIjoxNjU5MjY0MDkxLCJleHAiOjE2NTk4Njg4OTEsImRhdGEiOnsidXNlciI6eyJpZCI6IjMwIn19fQ.t9rBxmg6RH6uYkSQY7xQsx9QcQdwmKzBfpzmpznev8I"
+      }
+    }
+    return await axios(config).then(res => {
+      return {
+        tickets: res.data
+      }
+    }).catch(err => {
+      console.log(err)
+    })
   }
 }
 </script>

@@ -15,7 +15,11 @@
     <h3 class="pb-2">My Saved</h3>
     <div class="container g-0 mb-10">
       <div class="row row-cols-1 row-xl-cols-2">
-        <SavedBox v-for="item in data" :key="item.id" :title="item.title" :thumb="item.thumb" :price="item.price" :score="item.score"/>
+        <SavedBox v-if="savedProducts.length"
+                  v-for="item in savedProducts" :key="item.id" :title="item.acf.product_title"
+                  @deleting="deleteFromSaved($event, item.id)"
+                  :thumb="item.acf.productimage" :price="item.acf.product_price"
+                  :score="item.acf.productstar"/>
       </div>
     </div>
   </div>
@@ -25,6 +29,7 @@
 <script>
 import ProductScore from "~/components/ProductScore";
 import SavedBox from "~/components/SavedBox";
+import axios from "axios";
 
 export default {
   name: "index",
@@ -40,6 +45,38 @@ export default {
         {id: 5, thumb: "/images/img1.jpg", title: "Sella body butter", score: 4, price: 350},
       ]
     }
+  },
+  methods: {
+    async deleteFromSaved(e, id) {
+      const config = {
+        method: 'delete',
+        url: `https://api.intelligilesolutions.com/wp-json/wp/v2/savedproducts/${id}`,
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLmludGVsbGlnaWxlc29sdXRpb25zLmNvbSIsImlhdCI6MTY1OTI2NDA5MSwibmJmIjoxNjU5MjY0MDkxLCJleHAiOjE2NTk4Njg4OTEsImRhdGEiOnsidXNlciI6eyJpZCI6IjMwIn19fQ.t9rBxmg6RH6uYkSQY7xQsx9QcQdwmKzBfpzmpznev8I"
+        }
+      }
+      await axios(config).then(res => {
+        console.log(res)
+      }).catch(err => {
+        console.log(err)
+      })
+    }
+  },
+  async asyncData() {
+    const config = {
+      method: 'get',
+      url: "https://api.intelligilesolutions.com/wp-json/wp/v2/savedproducts",
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLmludGVsbGlnaWxlc29sdXRpb25zLmNvbSIsImlhdCI6MTY1OTI2NDA5MSwibmJmIjoxNjU5MjY0MDkxLCJleHAiOjE2NTk4Njg4OTEsImRhdGEiOnsidXNlciI6eyJpZCI6IjMwIn19fQ.t9rBxmg6RH6uYkSQY7xQsx9QcQdwmKzBfpzmpznev8I"
+      }
+    }
+    return await axios(config).then(res => {
+      return {savedProducts: res.data}
+    }).catch(err => {
+      console.log(err)
+    })
   }
 }
 </script>

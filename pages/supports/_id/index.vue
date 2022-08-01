@@ -21,7 +21,7 @@
       <div class="d-flex align-items-center gap-2">
         <img src="~/assets/svg/user.svg" alt="" width="15">
         <div class="d-block">
-          <h4 class="mb-0">{{ ticket.user.name }}</h4>
+          <h4 class="mb-0">{{ ticket.ticket_author }}</h4>
           <span id="id">#{{ $route.params.id }}</span>
         </div>
       </div>
@@ -33,7 +33,7 @@
           <span class="title flex-1">{{ ticket.department }}</span>
         </div>
         <div class="d-flex"><span class="flex-1">Priority:</span>
-          <span class="title flex-1">{{ ticket.priority }}</span>
+          <span class="title flex-1">{{ ticket.ticket_Priority }}</span>
         </div>
       </div>
       <div class="gap-2 d-lg-flex d-none" v-if="!ticket.closed">
@@ -41,12 +41,20 @@
         <div class="button">Answer</div>
       </div>
     </div>
-    <ticket-box :data="item" v-for="(item, index) in data" :key="index" :no-state="true"/>
+    <ticket-box :data="{
+      id: item.id,
+      user: {avatar: '', name: item.acf.ticket_author},
+      time: new Date(item.acf.date).toDateString() + ' ' + item.acf.time,
+      message: item.acf.ticket_content,
+      state: item.acf.ticket_status,
+      priority: item.acf.ticket_Priority
+      }" v-for="(item, index) in answers" :key="item.id" :no-state="true"/>
   </div>
 </template>
 
 <script>
 import TicketBox from "~/components/TicketBox";
+import axios from "axios";
 export default {
   name: "index",
   components: {TicketBox},
@@ -114,6 +122,41 @@ export default {
         },
       ]
     }
+  },
+  async asyncData({params}) {
+    const config = {
+      method: 'get',
+      url: "https://api.intelligilesolutions.com/wp-json/wp/v2/ticketanswer",
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLmludGVsbGlnaWxlc29sdXRpb25zLmNvbSIsImlhdCI6MTY1OTI2NDA5MSwibmJmIjoxNjU5MjY0MDkxLCJleHAiOjE2NTk4Njg4OTEsImRhdGEiOnsidXNlciI6eyJpZCI6IjMwIn19fQ.t9rBxmg6RH6uYkSQY7xQsx9QcQdwmKzBfpzmpznev8I"
+      }
+    }
+    let answers = null
+    let ticket = null
+    await axios(config).then(res => {
+      answers = res.data.filter(item => {
+        return item.acf.ticketid === params.id
+      })
+    }).catch(err => {
+      console.log(err)
+    })
+
+    const configTicket = {
+      method: 'get',
+      url: `https://api.intelligilesolutions.com/wp-json/wp/v2/ticket/${params.id}`,
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLmludGVsbGlnaWxlc29sdXRpb25zLmNvbSIsImlhdCI6MTY1OTI2NDA5MSwibmJmIjoxNjU5MjY0MDkxLCJleHAiOjE2NTk4Njg4OTEsImRhdGEiOnsidXNlciI6eyJpZCI6IjMwIn19fQ.t9rBxmg6RH6uYkSQY7xQsx9QcQdwmKzBfpzmpznev8I"
+      }
+    }
+    await axios(configTicket).then(res => {
+      ticket = res.data.acf
+    }).catch(err => {
+      console.log(err)
+    })
+
+    return {answers: answers, ticket: ticket}
   }
 }
 </script>
